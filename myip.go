@@ -11,6 +11,7 @@ import (
 
 const (
 	cloudflare = "http://1.1.1.1/cdn-cgi/trace"
+	ifconfig.me = "http://ifconfig.me"
 )
 
 // GetIP returns your public IP or an error
@@ -48,4 +49,17 @@ func GetIP() (net.IP, error) {
 	}
 
 	return nil, fmt.Errorf("Unable to find IP")
+}
+
+// ExternalIP returns your public IP.
+func ExternalIP() (string, error) {
+	resp, err := http.Get(ifconfig.me)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+	body, _ := ioutil.ReadAll(resp.Body)
+	buffer := new(bytes.Buffer)
+	buffer.ReadFrom(resp.Body)
+	return string(body), nil
 }

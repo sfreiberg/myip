@@ -51,8 +51,8 @@ func GetIP() (net.IP, error) {
 	return nil, fmt.Errorf("Unable to find IP")
 }
 
-// IfConfig_Me uses the ifconfig.me web service to get your public IP. It returns your public IP or an error.
-func IfConfig_Me() (net.IP, error) {
+// GetIPUsingIfConfig_Me uses the ifconfig.me web service to get your public IP. It returns your public IP or an error.
+func GetIPUsingIfConfig_Me() (net.IP, error) {
 	resp, err := http.Get(ifconfig.me)
 	if err != nil {
 		return nil, err

@@ -51,15 +51,15 @@ func GetIP() (net.IP, error) {
 	return nil, fmt.Errorf("Unable to find IP")
 }
 
-// ExternalIP returns your public IP.
-func ExternalIP() (string, error) {
+// IfConfig_Me uses the ifconfig.me web service to get your public IP. It returns your public IP or an error.
+func IfConfig_Me() (net.IP, error) {
 	resp, err := http.Get(ifconfig.me)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 	defer resp.Body.Close()
 	body, _ := ioutil.ReadAll(resp.Body)
 	buffer := new(bytes.Buffer)
 	buffer.ReadFrom(resp.Body)
-	return string(body), nil
+	return nil, fmt.Errorf("Unable to find IP")
 }

@@ -58,8 +58,16 @@ func GetIPUsingIfConfig_Me() (net.IP, error) {
 		return nil, err
 	}
 	defer resp.Body.Close()
-	body, _ := ioutil.ReadAll(resp.Body)
-	buffer := new(bytes.Buffer)
-	buffer.ReadFrom(resp.Body)
-	return nil, fmt.Errorf("Unable to find IP")
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, fmt.Errorf("Unable to read Body")
+	}
+
+	ipS := string(body)
+	ip := net.ParseIP(ipS)
+	if ip == nil {
+		return nil, fmt.Errorf("Unable to parse IP")
+	}
+	return ip, nil
+
 }

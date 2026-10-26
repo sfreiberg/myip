@@ -9,7 +9,9 @@ import (
 	"net/http"
 )
 
-const (
+// Service endpoints. These are variables so tests can point them at a local
+// server.
+var (
 	cloudflare = "http://1.1.1.1/cdn-cgi/trace"
 	ifconfigMe = "http://ifconfig.me"
 )

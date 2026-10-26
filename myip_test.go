@@ -60,7 +60,7 @@ func TestGetIP(t *testing.T) {
 }
 
 func TestGetIPUsingIfConfigMe(t *testing.T) {
-	serve(t, &ifconfigMe, 200, "192.0.2.44")
+	serve(t, &ifconfigMe, 200, "192.0.2.44\n")
 	ip, err := GetIPUsingIfConfigMe()
 	if err != nil {
 		t.Fatal(err)
@@ -85,6 +85,14 @@ func TestGetIPUsingIfConfigMeErrors(t *testing.T) {
 	})
 }
 
+func TestEndpointsUseHTTPS(t *testing.T) {
+	for _, u := range []string{cloudflare, ifconfigMe} {
+		if parsed, err := url.Parse(u); err != nil || parsed.Scheme != "https" {
+			t.Errorf("%s: want an https endpoint so the answer cannot be spoofed in transit", u)
+		}
+	}
+}
+
 // TestLiveGetIP queries the real Cloudflare endpoint. It is skipped with
 // -short or when the network is unreachable.
 func TestLiveGetIP(t *testing.T) {
@@ -92,6 +100,24 @@ func TestLiveGetIP(t *testing.T) {
 		t.Skip("skipping live network test in -short mode")
 	}
 	ip, err := GetIP()
+	if _, ok := errors.AsType[*url.Error](err); ok {
+		t.Skipf("network unavailable: %v", err)
+	}
+	if err != nil {
+		t.Fatalf("Unable to get ip: %s", err)
+	}
+	if ip == nil {
+		t.Fatal("got nil IP")
+	}
+}
+
+// TestLiveGetIPUsingIfConfigMe queries the real ifconfig.me endpoint. It is
+// skipped with -short or when the network is unreachable.
+func TestLiveGetIPUsingIfConfigMe(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping live network test in -short mode")
+	}
+	ip, err := GetIPUsingIfConfigMe()
 	if _, ok := errors.AsType[*url.Error](err); ok {
 		t.Skipf("network unavailable: %v", err)
 	}

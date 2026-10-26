@@ -1,3 +1,3 @@
 module github.com/sfreiberg/myip
 
-go 1.12
+go 1.26.0

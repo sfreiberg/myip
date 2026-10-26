@@ -4,7 +4,7 @@ package myip
 import (
 	"bytes"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net"
 	"net/http"
 )
@@ -31,13 +31,13 @@ func GetIP() (net.IP, error) {
 		return nil, err
 	}
 
-	out, err := ioutil.ReadAll(resp.Body)
+	out, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, fmt.Errorf("Unable to read the response body: %s", err)
 	}
 
-	lines := bytes.Split(out, []byte("\n"))
-	for _, line := range lines {
+	lines := bytes.SplitSeq(out, []byte("\n"))
+	for line := range lines {
 		if bytes.HasPrefix(line, []byte("ip=")) {
 			ipS := string(line[3:])
 			ip := net.ParseIP(ipS)
@@ -53,12 +53,12 @@ func GetIP() (net.IP, error) {
 
 // GetIPUsingIfConfigMe uses the ifconfig.me web service to get your public IP. It returns your public IP or an error.
 func GetIPUsingIfConfigMe() (net.IP, error) {
-	resp, err := http.Get(ifconfig.me)
+	resp, err := http.Get(ifconfigMe)
 	if err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
-	
+
 	if resp.StatusCode != 200 {
 		err = fmt.Errorf(
 			"Received unexpected status code from ifconfigMe, expected %v but got %v",
@@ -67,8 +67,8 @@ func GetIPUsingIfConfigMe() (net.IP, error) {
 		)
 		return nil, err
 	}
-	
-	body, err := ioutil.ReadAll(resp.Body)
+
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, fmt.Errorf("Unable to read Body")
 	}
